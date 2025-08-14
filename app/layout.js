@@ -3,7 +3,7 @@ export const metadata = {
   description: "Minimal daily goals with a wise mentor.",
 };
 
-import "./globals.css";
+import "../styles/globals.css";
 
 export default function RootLayout({ children }) {
   return (
