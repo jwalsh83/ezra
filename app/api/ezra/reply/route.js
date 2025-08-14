@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
 import { fallbackEzraReply } from "../../../../lib/ezra";
 
-const SYS = `You are Ezra: a calm, encouraging mentor.
-Be brief, human, and practical.
-Default to 2–3 exchanges to reach clear actions; continue only if the user asks.
-When appropriate, include a 3-item section titled "Checklist" with items <=7 words.
-Close with one short question: "Keep going, or good to go?"`;
+// Ezra style: warm, human, judgment-driven; no forced checklists.
+const SYS = `
+You are Ezra — a calm, wise mentor. Be human and practical.
+Start from judgment, not scripts. Keep momentum over perfection.
+Write naturally (1–3 short sentences unless the user asks for more).
+Ask at most one helpful question at a time.
+Only include a short "Checklist" if the user seems stuck or requests structure.
+Avoid repeating the user's goal verbatim; reflect it implicitly.
+Spiritual guidance should be invitational and brief when relevant.
+Close with “Keep going or good to go?” only when it fits the moment.
+`.trim();
 
 // Adds clear diagnostics without changing the UX
 export async function POST(req) {
-  const { messages, context } = await req.json();
+  const { messages = [], context = {} } = await req.json();
   const lastUser = messages?.[messages.length - 1]?.content || "";
   const key = process.env.OPENAI_API_KEY;
 
@@ -22,12 +28,27 @@ export async function POST(req) {
   }
 
   try {
+    // Provide lightweight, structured context separately from the main prompt.
+    // Keep it short so Ezra uses it, but doesn't parrot it.
+    const { goal = "", intent = "general", spiritual = "0", date = "", tz = "" } = context || {};
+    const ctxBlock =
+      `Context:\n` +
+      `- goal: ${goal ? `"${goal}"` : "(blank)"}\n` +
+      `- intent: ${intent}\n` +
+      `- spiritual: ${String(spiritual)}\n` +
+      (date ? `- date: ${date}\n` : "") +
+      (tz ? `- tz: ${tz}\n` : "");
+
     const body = {
       model: "gpt-4o-mini",
+      temperature: 0.7,          // a little warmth/variety
+      top_p: 0.95,
+      presence_penalty: 0.2,     // gentle nudge to avoid repetition
       messages: [
         { role: "system", content: SYS },
-        { role: "system", content: `Context: ${JSON.stringify(context)}` },
-        ...messages.map((m) => ({ role: m.role, content: m.content })),
+        { role: "system", content: ctxBlock },
+        // Pass through the running conversation:
+        ...messages.map(m => ({ role: m.role, content: m.content })),
       ],
     };
 
@@ -41,6 +62,7 @@ export async function POST(req) {
     });
 
     const raw = await res.text();
+
     if (!res.ok) {
       console.error("OpenAI error", res.status, raw);
       return NextResponse.json({
@@ -84,9 +106,5 @@ export async function POST(req) {
 }
 
 function safeSlice(str, n) {
-  try {
-    return String(str).slice(0, n);
-  } catch {
-    return "";
-  }
+  try { return String(str).slice(0, n); } catch { return ""; }
 }
