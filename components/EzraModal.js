@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { GuideIcon } from "./Icons";
-import { ACCENT, PLANNER_URL, escapeHTML } from "../lib/utils";
-import { seedEzraFirstTurn, fallbackEzraReply, buildPlannerURL, analyzeIntent } from "../lib/ezra";
+import { ACCENT, escapeHTML } from "../lib/utils";
+import { seedEzraFirstTurn, fallbackEzraReply, analyzeIntent } from "../lib/ezra";
 
 function renderAssistantHTML(text = "") {
   // Escape user-provided characters, then convert **bold** to <strong>
@@ -46,7 +46,7 @@ export default function EzraModal({ open, onClose, goal }){
           <div className="flex items-center gap-2 text-neutral-800"><GuideIcon/> <span className="font-medium">Ask Ezra</span></div>
           <button onClick={onClose} className="px-3 py-1.5 rounded-xl border border-neutral-300 hover:border-neutral-900 text-sm">Close</button>
         </div>
-        <div className="px-5 pt-4 text-sm text-neutral-600">Get help with this goal — brief, focused chat to define next steps. Ezra will lead, then you can reply.</div>
+
         <div className="px-5 pt-2 pb-4 text-neutral-900 italic">{goal}</div>
         
 <div className="px-5 overflow-y-auto flex-1 space-y-4">
@@ -61,7 +61,6 @@ export default function EzraModal({ open, onClose, goal }){
         <div className="p-4 border-t border-neutral-200 flex items-center gap-2">
           <input value={input} onChange={(e)=>setInput(e.target.value)} onKeyDown={(e)=>{ if(e.key==='Enter') send(); }} placeholder="Type a quick reply" className="flex-1 px-3 py-2 rounded-xl border border-neutral-300 outline-none focus:border-neutral-900" />
           <button onClick={send} className="px-4 py-2 rounded-2xl text-sm font-medium text-white" style={{ background: ACCENT }}>Send</button>
-          <a className="px-3 py-2 rounded-xl border border-neutral-300 text-sm hover:border-neutral-900" href={buildPlannerURL(PLANNER_URL, goal || "")} target="_blank" rel="noreferrer">Open in Ezra</a>
         </div>
       </div>
     </div>
