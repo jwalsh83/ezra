@@ -1,8 +1,14 @@
 "use client";
 import React from "react";
 import { GuideIcon } from "./Icons";
-import { ACCENT, PLANNER_URL } from "../lib/utils";
+import { ACCENT, PLANNER_URL, escapeHTML } from "../lib/utils";
 import { seedEzraFirstTurn, fallbackEzraReply, buildPlannerURL, analyzeIntent } from "../lib/ezra";
+
+function renderAssistantHTML(text = "") {
+  // Escape user-provided characters, then convert **bold** to <strong>
+  const html = escapeHTML(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  return <div className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: html }} />;
+}
 
 export default function EzraModal({ open, onClose, goal }){
   const [messages, setMessages] = React.useState([]);
@@ -42,10 +48,16 @@ export default function EzraModal({ open, onClose, goal }){
         </div>
         <div className="px-5 pt-4 text-sm text-neutral-600">Get help with this goal — brief, focused chat to define next steps. Ezra will lead, then you can reply.</div>
         <div className="px-5 pt-2 pb-4 text-neutral-900 italic">{goal}</div>
-        <div className="px-5 overflow-y-auto flex-1 space-y-4">
-          {messages.map((m, i)=> (<div key={i} className={m.role==='assistant' ? "" : "ml-auto text-right"}>{m.content}</div>))}
-          {loading && <div className="text-neutral-500">Ezra is thinking…</div>}
-        </div>
+        
+<div className="px-5 overflow-y-auto flex-1 space-y-4">
+  {messages.map((m, i) => (
+    <div key={i} className={m.role === "assistant" ? "" : "ml-auto text-right whitespace-pre-wrap"}>
+      {m.role === "assistant" ? renderAssistantHTML(m.content) : m.content}
+    </div>
+  ))}
+  {loading && <div className="text-neutral-500">Ezra is thinking…</div>}
+</div>
+        
         <div className="p-4 border-t border-neutral-200 flex items-center gap-2">
           <input value={input} onChange={(e)=>setInput(e.target.value)} onKeyDown={(e)=>{ if(e.key==='Enter') send(); }} placeholder="Type a quick reply" className="flex-1 px-3 py-2 rounded-xl border border-neutral-300 outline-none focus:border-neutral-900" />
           <button onClick={send} className="px-4 py-2 rounded-2xl text-sm font-medium text-white" style={{ background: ACCENT }}>Send</button>
