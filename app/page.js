@@ -89,10 +89,50 @@ export default function Page(){
               <motion.section key="entry" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:0.2}} className="space-y-8">
                 <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Set today’s intent</h1>
                 <div className="space-y-6 text-lg md:text-xl leading-relaxed">
-                  <IntentRow id="success" labelPrefix="Today will be successful if" value={success} setValue={setSuccess} focused={focusIdx===0} locked={locked.success} onAdvance={()=>advanceFrom('success')} openFor={openFor} setOpenFor={setOpenFor} suggestions={pick3(SUGGESTIONS.success, mulberry32(1))} onShuffle={()=>{}} />
-                  <IntentRow id="need" labelPrefix="I need to" value={need} setValue={setNeed} focused={focusIdx===1} locked={locked.need} onAdvance={()=>advanceFrom('need')} openFor={openFor} setOpenFor={setOpenFor} suggestions={pick3(SUGGESTIONS.need, mulberry32(2))} onShuffle={()=>{}} />
-                  <IntentRow id="become" labelPrefix="I want to be" value={become} setValue={setBecome} focused={focusIdx===2} locked={locked.become} onAdvance={()=>advanceFrom('become')} openFor={openFor} setOpenFor={setOpenFor} suggestions={pick3(SUGGESTIONS.become, mulberry32(3))} onShuffle={()=>{}} />
-                </div>
+                 
+  <IntentRow
+  id="success"
+  labelPrefix="Today will be successful if"
+  value={success}
+  setValue={setSuccess}
+  focused={focusIdx===0}
+  locked={locked.success}
+  onAdvance={()=>advanceFrom('success')}
+  openFor={openFor}
+  setOpenFor={setOpenFor}
+  suggestions={suggestMap.success}
+  onShuffle={()=>shuffle('success')}
+/>
+
+<IntentRow
+  id="need"
+  labelPrefix="I need to"
+  value={need}
+  setValue={setNeed}
+  focused={focusIdx===1}
+  locked={locked.need}
+  onAdvance={()=>advanceFrom('need')}
+  openFor={openFor}
+  setOpenFor={setOpenFor}
+  suggestions={suggestMap.need}
+  onShuffle={()=>shuffle('need')}
+/>
+
+<IntentRow
+  id="become"
+  labelPrefix="I want to be"
+  value={become}
+  setValue={setBecome}
+  focused={focusIdx===2}
+  locked={locked.become}
+  onAdvance={()=>advanceFrom('become')}
+  openFor={openFor}
+  setOpenFor={setOpenFor}
+  suggestions={suggestMap.become}
+  onShuffle={()=>shuffle('become')}
+/>
+
+                
                 <div className="flex items-center justify-between pt-2">
                   <button onClick={resetEntryFields} className="px-4 py-2 rounded-xl border border-neutral-300 hover:border-neutral-900 text-sm">Reset</button>
                   <button onClick={handleSubmit} disabled={!canSubmit} className={classNames("px-5 py-2.5 rounded-2xl text-sm font-medium text-white", focusIdx===3?"ring-2 ring-offset-2":"", !canSubmit?"opacity-50 cursor-not-allowed":"")} style={{ background: ACCENT }}>Save & Continue</button>
